@@ -1,25 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { login } from "@/lib/api";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const router = useRouter();
 
   const handleLogin = async () => {
-    const data = await login(email, password);
+    const res = await fetch("http://localhost:8000/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-    // Save JWT token
+    const data = await res.json();
+
+    // 🔐 JWT store
     localStorage.setItem("token", data.access_token);
 
+    // ➡️ redirect to chat
     router.push("/chat");
   };
 
   return (
-    <div className="container">
+    <div>
       <h2>Login</h2>
 
       <input
@@ -40,3 +49,4 @@ export default function LoginPage() {
     </div>
   );
 }
+
